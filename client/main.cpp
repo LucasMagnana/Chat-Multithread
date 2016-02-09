@@ -118,12 +118,7 @@ int main()
 
         }
     }
-
     fclose(config);
-
-    pseudo_str += " : ";
-
-
 
     std::cout << "Entrez l'IP: ";
 
@@ -149,6 +144,8 @@ int main()
 
     }
 
+    envoi_donnee(sock, pseudo_str);
+    pseudo_str += " : ";
     thread thread_envoi(fcn_thread_envoi, sock, pseudo_str);
     thread_envoi.detach();
     thread thread_reception(reception, sock);

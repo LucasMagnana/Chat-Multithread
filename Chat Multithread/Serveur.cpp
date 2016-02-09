@@ -73,7 +73,7 @@ void Serveur::demarrage()
                 m_sockets.push_back(accept(m_listenning_sock, (SOCKADDR*)&m_csin, &m_crecsize)); /*Ajout du socket envoyé par le client dans le tableau dynamique de sockets du serveur */
                 m_connexion ++;
                 cout << "Un client se connecte avec la socket" << m_sockets[m_connexion-1] << "de " << inet_ntoa(m_csin.sin_addr) << " : " << htons(m_csin.sin_port) <<endl;
-                if (check_pseudo(m_listenning_sock) == true)
+                if (check_pseudo(m_sockets[m_connexion-1]) == true)
                 {
                     m_threads.push_back(thread(&Serveur::thread_client, this, this, m_sockets[m_connexion-1])); /* Creation (et lancement) d'un thread dans le tableau dynamique de thread qui va s'occuper du client qui vient de se connecter */
                     m_threads[m_connexion-1].detach();
@@ -120,7 +120,6 @@ void Serveur::thread_client(Serveur *serveur, SOCKET sock)
             buffer = (char*)realloc(buffer, taille_int);
             if(sock_err = recv(sock, buffer, taille_int,0) != -1)
             {
-                for(int i=0; i<taille_int; i++) printf("%c", buffer[i]);
                 for(int i =0; i < serveur->m_connexion; i++)
                 {
                     if (m_sockets[i] != sock)
@@ -135,7 +134,7 @@ void Serveur::thread_client(Serveur *serveur, SOCKET sock)
                             serveur->m_threads.erase(serveur->m_threads.begin()+i);
                             serveur->m_clients.erase(serveur->m_clients.begin()+i);
                         }
-                        else cout << "envoi reussit" << endl;
+                       // else cout << "envoi reussit" << endl;
                     }
                 }
             }
@@ -160,19 +159,21 @@ bool Serveur::check_pseudo(SOCKET sock)
 
     sock_err = recv(sock, taille, 4, 0);
 
+    //cout << sock_err <<endl;
+
     if (sock_err != -1)
     {
         taille_int = atoi(taille);
         buffer = (char*)realloc(buffer, taille_int);
         if(sock_err = recv(sock, buffer, taille_int,0) != -1)
         {
-            for(int i=0; i<m_connexion;i++)
+            for(int i=0; i<m_connexion-1;i++)
             {
+                cout << (m_clients[i].pseudo).compare(buffer)<<endl;
                 if (m_clients[i].pseudo.compare(buffer) == 0) return false;
 
             }
         }
-        return true;
 
     }
 
