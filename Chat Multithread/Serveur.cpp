@@ -153,31 +153,35 @@ bool Serveur::check_pseudo(SOCKET sock)
     int taille_int, sock_err;
     char taille[4];
     char *buffer = (char*)calloc(8, sizeof(char));
+    bool retour = true;
 
     //cout << "bite" << endl;
     //cout << serveur->m_connexion <<endl;
 
     sock_err = recv(sock, taille, 4, 0);
 
-    //cout << sock_err <<endl;
 
     if (sock_err != -1)
     {
+
         taille_int = atoi(taille);
         buffer = (char*)realloc(buffer, taille_int);
-        if(sock_err = recv(sock, buffer, taille_int,0) != -1)
+        sock_err = recv(sock, buffer, taille_int,0);
+        if(sock_err != -1)
         {
             for(int i=0; i<m_connexion-1;i++)
             {
                 cout << (m_clients[i].pseudo).compare(buffer)<<endl;
-                if (m_clients[i].pseudo.compare(buffer) == 0) return false;
+                if (m_clients[i].pseudo.compare(buffer) == 0) retour = false;
+                else retour = true;
 
             }
         }
 
-    }
 
-    else return true;
+    cout << retour <<endl;
+    return retour;
+    }
 
 }
 
