@@ -4,6 +4,7 @@
 #include <thread>
 #include <winsock2.h>
 #include <vector>
+#include "clients.h"
 
 
 using namespace std;
@@ -16,6 +17,7 @@ class Serveur{
         void demarrage();
         void thread_client(Serveur *serveur, SOCKET sock);
         void thread_serveur(Serveur *serveur);
+        bool check_pseudo(SOCKET sock);
 
     private:
         vector <SOCKET> m_sockets;
@@ -24,6 +26,8 @@ class Serveur{
         SOCKADDR_IN m_sin, m_csin;
         int m_sock_err;
         int m_port, m_recsize, m_crecsize, m_connexion;
+        vector <clients> m_clients;
+        char *m_der_pseudo;
 };
 
 #endif // SERVEUR_H_INCLUDED

@@ -8,6 +8,7 @@ Serveur::Serveur(int port)
 {
    m_port = port;
    m_connexion = 0;
+   m_der_pseudo = (char*)calloc(8, sizeof(char));
 }
 
 
@@ -72,8 +73,22 @@ void Serveur::demarrage()
                 m_sockets.push_back(accept(m_listenning_sock, (SOCKADDR*)&m_csin, &m_crecsize)); /*Ajout du socket envoyé par le client dans le tableau dynamique de sockets du serveur */
                 m_connexion ++;
                 cout << "Un client se connecte avec la socket" << m_sockets[m_connexion-1] << "de " << inet_ntoa(m_csin.sin_addr) << " : " << htons(m_csin.sin_port) <<endl;
-                m_threads.push_back(thread(&Serveur::thread_client, this, this, m_sockets[m_connexion-1])); /* Creation (et lancement) d'un thread dans le tableau dynamique de thread qui va s'occuper du client qui vient de se connecter */
-                m_threads[m_connexion-1].detach();
+                if (check_pseudo(m_listenning_sock) == true)
+                {
+                    m_threads.push_back(thread(&Serveur::thread_client, this, this, m_sockets[m_connexion-1])); /* Creation (et lancement) d'un thread dans le tableau dynamique de thread qui va s'occuper du client qui vient de se connecter */
+                    m_threads[m_connexion-1].detach();
+                    clients struct_temoin;
+                    m_clients.push_back(struct_temoin);
+                    m_clients[m_connexion-1].sock =  m_sockets[m_connexion-1];
+                    m_clients[m_connexion-1].IP = inet_ntoa(m_csin.sin_addr);
+
+                }
+
+                else
+                {
+                    m_connexion --;
+                    m_sockets.pop_back();
+                }
 
             }
 
@@ -90,6 +105,52 @@ void Serveur::thread_client(Serveur *serveur, SOCKET sock)
     {
 
 
+        int taille_int, sock_err;
+        char taille[4];
+        char *buffer = (char*)calloc(8, sizeof(char));
+
+        //cout << "bite" << endl;
+        //cout << serveur->m_connexion <<endl;
+
+        sock_err = recv(sock, taille, 4, 0);
+
+        if (sock_err != -1)
+        {
+            taille_int = atoi(taille);
+            buffer = (char*)realloc(buffer, taille_int);
+            if(sock_err = recv(sock, buffer, taille_int,0) != -1)
+            {
+                for(int i=0; i<taille_int; i++) printf("%c", buffer[i]);
+                for(int i =0; i < serveur->m_connexion; i++)
+                {
+                    if (m_sockets[i] != sock)
+                    {
+                        sock_err = send(serveur->m_sockets[i], taille, 4, 0);
+                        sock_err = send(serveur->m_sockets[i], buffer, taille_int, 0);
+                        //cout << serveur->m_sockets[i] <<endl;
+                        if (sock_err == -1)
+                        {
+                            cout << m_clients[i].pseudo << "c'est déconnecté" << endl;
+                            serveur->m_sockets.erase(serveur->m_sockets.begin()+i);
+                            serveur->m_threads.erase(serveur->m_threads.begin()+i);
+                            serveur->m_clients.erase(serveur->m_clients.begin()+i);
+                        }
+                        else cout << "envoi reussit" << endl;
+                    }
+                }
+            }
+        }
+    // else cout << "sa a pas marcher" << endl;
+        }
+}
+
+
+
+
+
+
+bool Serveur::check_pseudo(SOCKET sock)
+{
     int taille_int, sock_err;
     char taille[4];
     char *buffer = (char*)calloc(8, sizeof(char));
@@ -105,50 +166,18 @@ void Serveur::thread_client(Serveur *serveur, SOCKET sock)
         buffer = (char*)realloc(buffer, taille_int);
         if(sock_err = recv(sock, buffer, taille_int,0) != -1)
         {
-            for(int i=0; i<taille_int; i++) printf("%c", buffer[i]);
-            for(int i =0; i < serveur->m_connexion; i++)
+            for(int i=0; i<m_connexion;i++)
             {
-                if (m_sockets[i] != sock)
-                {
-                    sock_err = send(serveur->m_sockets[i], taille, 4, 0);
-                    sock_err = send(serveur->m_sockets[i], buffer, taille_int, 0);
-                    //cout << serveur->m_sockets[i] <<endl;
-                    //if (sock_err == -1) cout << "sa a pas marcher" <<endl;
-                    //else cout << "envoi reussit" << endl;
-                }
+                if (m_clients[i].pseudo.compare(buffer) == 0) return false;
+
             }
         }
-    }
-   // else cout << "sa a pas marcher" << endl;
-    }
-}
-
-
-
-void Serveur::thread_serveur(Serveur *serveur)
-{
-    int sock_err;
-    /* Si la socket fonctionne */
-    if(sock_err != SOCKET_ERROR)
-    {
-        /* Démarrage du listage (mode server) */
-        sock_err = listen(serveur->m_listenning_sock, 2);
-        cout << "Listage du port " << serveur->m_port << "..." << endl;
-
-        /* Si la socket fonctionne */
-        if(sock_err != SOCKET_ERROR)
-        {
-            /* Attente pendant laquelle le client se connecte */
-            cout << "Patientez pendant que le client se connecte sur le port " << serveur->m_port << "..." << endl;
-            serveur->m_sockets.push_back(accept(serveur->m_listenning_sock, (SOCKADDR*)&serveur->m_csin, &serveur->m_crecsize)); /*Ajout du socket envoyé par le client dans le tableau dynamique de sockets du serveur */
-            serveur->m_connexion ++;
-            cout << "Un client se connecte avec la socket" << m_sockets[m_connexion-1] << "de " << inet_ntoa(m_csin.sin_addr) << " : " << htons(m_csin.sin_port) <<endl;
-            serveur->m_threads.push_back(thread(&Serveur::thread_client, serveur, serveur, serveur->m_sockets[serveur->m_connexion-1])); /* Creation (et lancement) d'un thread dans le tableau dynamique de thread qui va s'occuper du client qui vient de se connecter */
-            serveur->m_threads[serveur->m_connexion-1].detach();
-
-        }
+        return true;
 
     }
+
+    else return true;
+
 }
 
 
