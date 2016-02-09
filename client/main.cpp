@@ -11,32 +11,38 @@
 using namespace std;
 
 
-void envoi(SOCKET sock, string str_envoi)
+
+void envoi_donnee(SOCKET sock, string str_envoi)
 {
 
+    char *chaine = new char [str_envoi.length()+1];
+    strcpy (chaine, str_envoi.c_str());
+    char taille[4];
+    sprintf(taille, "%d", str_envoi.length()+1);
+
+    int sock_err, taille_int;
+
+    sock_err = send(sock, taille, 4, 0);
+    if (sock_err == -1) cout << "sa a pas marcher" <<endl;
+    //else cout << "envoi reussit" <<endl;
+
+    sock_err = send(sock, chaine, str_envoi.length()+1, 0);
+    if (sock_err == -1) cout << "sa a pas marcher" <<endl;
+    //else cout << "envoi reussit" <<endl;
+
+
+}
+
+void fcn_thread_envoi(SOCKET sock, string str_pseudo)
+{
     while(1)
     {
-        string str;
-        //cin >> str;
+        string str = ("Je viens de me connecter...");
+        string str_envoi;
         getline(cin, str);
-        str_envoi += " : ";
-        str_envoi += str;
-        char *chaine = new char [str_envoi.length()+1];
-        strcpy (chaine, str_envoi.c_str());
-        char taille[4];
-        sprintf(taille, "%d", str_envoi.length()+1);
-
-        int sock_err, taille_int;
-
-        sock_err = send(sock, taille, 4, 0);
-        if (sock_err == -1) cout << "sa a pas marcher" <<endl;
-        //else cout << "envoi reussit" <<endl;
-
-        sock_err = send(sock, chaine, str_envoi.length()+1, 0);
-        if (sock_err == -1) cout << "sa a pas marcher" <<endl;
-        //else cout << "envoi reussit" <<endl;
+        str_envoi = str_pseudo + str;
+        envoi_donnee(sock, str_envoi);
     }
-
 }
 
 
@@ -77,25 +83,24 @@ int main()
 
     char IP[100], taille_pseudo[4];
 
-    int taille_int = 0, err;
+    int taille_int, err;
 
     string pseudo_str = "";
 
     FILE *config = NULL;
-    config = fopen("config.izi","w");
+    config = fopen("config.izi","r+");
 
     if(config != NULL)
     {
-        err = fscanf(config, "%d", taille_int);
+        err = fscanf(config, "%d", &taille_int);
         if (err < 0)
         {
 
             cout << "Entrez votre pseudo : ";
             cin >> pseudo_str;
             sprintf(taille_pseudo, "%d", pseudo_str.length()+1);
-            cout << taille_pseudo << endl;
-            fputs("biteeeeee", config);
-            //fputc('\n', config);
+            fputs(taille_pseudo, config);
+            fputc(' ', config);
             char *pseudo = new char [pseudo_str.length()+1];
             strcpy (pseudo, pseudo_str.c_str());
             fputs(pseudo, config);
@@ -104,15 +109,19 @@ int main()
         else
         {
             fseek(config, 1, SEEK_CUR);
+            fscanf(config, "%d", &taille_int);
             char *pseudo = new char [taille_int+1];
             fgets(pseudo, taille_int+1, config);
-            cout << pseudo;
+            cout << "Votre pseudo est " << pseudo <<endl;
+            pseudo_str = pseudo;
 
 
         }
     }
 
     fclose(config);
+
+    pseudo_str += " : ";
 
 
 
@@ -140,7 +149,7 @@ int main()
 
     }
 
-    thread thread_envoi(envoi, sock, pseudo_str);
+    thread thread_envoi(fcn_thread_envoi, sock, pseudo_str);
     thread_envoi.detach();
     thread thread_reception(reception, sock);
     thread_reception.join();
