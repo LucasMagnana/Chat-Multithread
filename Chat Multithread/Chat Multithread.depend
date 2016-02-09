@@ -1,0 +1,35 @@
+# depslib dependency file v1.0
+1454882202 source:c:\users\bernard\desktop\chat multithread\main.cpp
+	<iostream>
+	"Serveur.h"
+
+1454883164 c:\users\bernard\desktop\chat multithread\serveur.h
+	<thread>
+	<winsock2.h>
+	<vector>
+
+1454882184 source:c:\users\bernard\desktop\chat multithread\serveur.cpp
+	"Serveur.h"
+	<stdlib.h>
+	<stdio.h>
+	<iostream>
+
+1454882202 source:f:\c c++\chat multithread\main.cpp
+	<iostream>
+	"Serveur.h"
+
+1454935398 f:\c c++\chat multithread\serveur.h
+	<thread>
+	<winsock2.h>
+	<vector>
+
+1455009463 source:f:\c c++\chat multithread\serveur.cpp
+	"Serveur.h"
+	<stdlib.h>
+	<stdio.h>
+	<iostream>
+	"clients.h"
+
+1455009504 f:\c c++\chat multithread\clients.h
+	<winsock2.h>
+
