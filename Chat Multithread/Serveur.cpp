@@ -81,11 +81,13 @@ void Serveur::demarrage()
                     m_clients.push_back(struct_temoin);
                     m_clients[m_connexion-1].sock =  m_sockets[m_connexion-1];
                     m_clients[m_connexion-1].IP = inet_ntoa(m_csin.sin_addr);
+                    m_clients[m_connexion-1].pseudo = m_der_pseudo;
 
                 }
 
                 else
                 {
+                    envoi_donnee(m_sockets[m_connexion-1], "Serveur : Connexion impossible, votre pseudo est deja utilise...", 63);
                     m_connexion --;
                     m_sockets.pop_back();
                 }
@@ -124,15 +126,15 @@ void Serveur::thread_client(Serveur *serveur, SOCKET sock)
                 {
                     if (m_sockets[i] != sock)
                     {
-                        sock_err = send(serveur->m_sockets[i], taille, 4, 0);
-                        sock_err = send(serveur->m_sockets[i], buffer, taille_int, 0);
+                        sock_err = envoi_donnee(serveur->m_sockets[i], buffer, taille_int);
                         //cout << serveur->m_sockets[i] <<endl;
                         if (sock_err == -1)
                         {
-                            cout << m_clients[i].pseudo << "c'est déconnecté" << endl;
+                            cout << m_clients[i].pseudo << " est parti !" << endl;
                             serveur->m_sockets.erase(serveur->m_sockets.begin()+i);
                             serveur->m_threads.erase(serveur->m_threads.begin()+i);
                             serveur->m_clients.erase(serveur->m_clients.begin()+i);
+                            m_connexion --;
                         }
                        // else cout << "envoi reussit" << endl;
                     }
@@ -144,13 +146,35 @@ void Serveur::thread_client(Serveur *serveur, SOCKET sock)
 }
 
 
+int Serveur::envoi_donnee(SOCKET sock, char *chaine, int taille)
+{
+
+    char taille_chr[4];
+    sprintf(taille_chr, "%d", taille);
+
+    int sock_err;
+
+    sock_err = send(sock, taille_chr, 4, 0);
+    if (sock_err == -1) cout << "sa a pas marcher" <<endl;
+    else
+    {
+        sock_err = send(sock, chaine, taille, 0);
+        if (sock_err == -1) cout << "sa a pas marcher" <<endl;
+        //else cout << "envoi reussit" <<endl;
+    }
+
+    return sock_err;
+
+}
+
+
 
 
 
 
 bool Serveur::check_pseudo(SOCKET sock)
 {
-    int taille_int, sock_err;
+    int taille_int, sock_err ,i = 0;
     char taille[4];
     char *buffer = (char*)calloc(8, sizeof(char));
     bool retour = true;
@@ -161,7 +185,7 @@ bool Serveur::check_pseudo(SOCKET sock)
     sock_err = recv(sock, taille, 4, 0);
 
 
-    if (sock_err != -1)
+    if (sock_err != -1 && m_connexion >= 1)
     {
 
         taille_int = atoi(taille);
@@ -169,20 +193,35 @@ bool Serveur::check_pseudo(SOCKET sock)
         sock_err = recv(sock, buffer, taille_int,0);
         if(sock_err != -1)
         {
-            for(int i=0; i<m_connexion-1;i++)
+            while(i<m_connexion-1 && retour == true)
             {
-                cout << (m_clients[i].pseudo).compare(buffer)<<endl;
+                cout << i << " : " << (m_clients[i].pseudo).compare(buffer)<<endl;
                 if (m_clients[i].pseudo.compare(buffer) == 0) retour = false;
                 else retour = true;
+                i++;
 
             }
         }
-
-
     cout << retour <<endl;
+    m_der_pseudo = buffer;
     return retour;
     }
+}
+
+
+void Serveur::enregistrement_son(int i)
+{
+    sf::SoundBufferRecorder enregistrement;
+    enregistrement.start();
+    m_horloge.restart();
+    sf::Time timer = m_horloge.getElapsedTime();
+    while(timer.asMilliseconds() < 50) timer = m_horloge.getElapsedTime();
+    enregistrement.stop();
+    m_buffers[i] = enregistrement.getBuffer();
+    sf::Packet envoi();
+    //envoi << enregistrement;
 
 }
+
 
 

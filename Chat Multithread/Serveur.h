@@ -6,6 +6,13 @@
 #include <vector>
 #include "clients.h"
 
+#include <SFML/Audio/SoundBufferRecorder.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/System/Time.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/Network/Packet.hpp>
+
+
 
 using namespace std;
 
@@ -18,6 +25,8 @@ class Serveur{
         void thread_client(Serveur *serveur, SOCKET sock);
         void thread_serveur(Serveur *serveur);
         bool check_pseudo(SOCKET sock);
+        int envoi_donnee(SOCKET sock, char *chaine, int taille);
+        void enregistrement_son(int i);
 
     private:
         vector <SOCKET> m_sockets;
@@ -27,7 +36,9 @@ class Serveur{
         int m_sock_err;
         int m_port, m_recsize, m_crecsize, m_connexion;
         vector <clients> m_clients;
-        char *m_der_pseudo;
+        string m_der_pseudo;
+        sf::Clock m_horloge;
+        vector <sf::SoundBuffer> m_buffers;
 };
 
 #endif // SERVEUR_H_INCLUDED

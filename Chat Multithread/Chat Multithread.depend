@@ -54,3 +54,89 @@
 	<winsock2.h>
 	<string>
 
+1455132707 source:f:\c-c++\bite\chat-multithread\chat multithread\main.cpp
+	<iostream>
+	"Serveur.h"
+
+1455137787 f:\c-c++\bite\chat-multithread\chat multithread\serveur.h
+	<thread>
+	<winsock2.h>
+	<vector>
+	"clients.h"
+	<SFML/Audio/SoundBufferRecorder.hpp>
+	<SFML/Audio/SoundBuffer.hpp>
+	<SFML/System/Time.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/Network/Packet.hpp>
+
+1455132707 f:\c-c++\bite\chat-multithread\chat multithread\clients.h
+	<winsock2.h>
+	<string>
+
+1455136406 source:f:\c-c++\bite\chat-multithread\chat multithread\serveur.cpp
+	"Serveur.h"
+	<stdlib.h>
+	<stdio.h>
+	<iostream>
+	"clients.h"
+
+1455106988 f:\codeblocks\sfml-2.3.2\include\sfml\audio\soundbufferrecorder.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/SoundBuffer.hpp>
+	<SFML/Audio/SoundRecorder.hpp>
+	<vector>
+
+1455106988 f:\codeblocks\sfml-2.3.2\include\sfml\audio\export.hpp
+	<SFML/Config.hpp>
+
+1455106987 f:\codeblocks\sfml-2.3.2\include\sfml\config.hpp
+	"TargetConditionals.h"
+
+1455106988 f:\codeblocks\sfml-2.3.2\include\sfml\audio\soundbuffer.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/AlResource.hpp>
+	<SFML/System/Time.hpp>
+	<string>
+	<vector>
+	<set>
+
+1455106988 f:\codeblocks\sfml-2.3.2\include\sfml\audio\alresource.hpp
+	<SFML/Audio/Export.hpp>
+
+1455106990 f:\codeblocks\sfml-2.3.2\include\sfml\system\time.hpp
+	<SFML/System/Export.hpp>
+
+1455106990 f:\codeblocks\sfml-2.3.2\include\sfml\system\export.hpp
+	<SFML/Config.hpp>
+
+1455106988 f:\codeblocks\sfml-2.3.2\include\sfml\audio\soundrecorder.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/AlResource.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/Time.hpp>
+	<vector>
+	<string>
+
+1455106990 f:\codeblocks\sfml-2.3.2\include\sfml\system\thread.hpp
+	<SFML/System/Export.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+	<SFML/System/Thread.inl>
+
+1455106990 f:\codeblocks\sfml-2.3.2\include\sfml\system\noncopyable.hpp
+	<SFML/System/Export.hpp>
+
+1455106990 f:\codeblocks\sfml-2.3.2\include\sfml\system\thread.inl
+
+1455106989 f:\codeblocks\sfml-2.3.2\include\sfml\system\clock.hpp
+	<SFML/System/Export.hpp>
+	<SFML/System/Time.hpp>
+
+1455106989 f:\codeblocks\sfml-2.3.2\include\sfml\network\packet.hpp
+	<SFML/Network/Export.hpp>
+	<string>
+	<vector>
+
+1455106989 f:\codeblocks\sfml-2.3.2\include\sfml\network\export.hpp
+	<SFML/Config.hpp>
+
