@@ -1,28 +1,23 @@
 # depslib dependency file v1.0
-1454778788 source:c:\users\memorax\desktop\client\main.cpp
-	<stdlib.h>
-	<stdio.h>
-	<winsock2.h>
-	<iostream>
-	"Constantes.h"
-
-1444401882 c:\users\memorax\desktop\client\constantes.h
-
-1455007032 source:f:\c c++\client\main.cpp
+1455273954 source:f:\c-c++\chat-multithread_sauvegarde\client\main.cpp
 	<stdlib.h>
 	<stdio.h>
 	<winsock2.h>
 	<iostream>
 	<thread>
 	<string>
+	<SFML/Network.hpp>
+	<SFML/System.hpp>
+	<SFML/Audio.hpp>
 
-1444401882 f:\c c++\client\constantes.h
-
-1455039316 source:f:\c-c++\chat-multithread\client\main.cpp
+1455298752 source:c:\users\memorax\desktop\chat-multithread_sauvegarde\client\main.cpp
 	<stdlib.h>
 	<stdio.h>
 	<winsock2.h>
 	<iostream>
 	<thread>
 	<string>
+	<SFML/Network.hpp>
+	<SFML/System.hpp>
+	<SFML/Audio.hpp>
 

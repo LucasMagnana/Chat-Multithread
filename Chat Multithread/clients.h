@@ -2,6 +2,8 @@
 #define CLIENTS_H_INCLUDED
 #include <winsock2.h>
 #include <string>
+#include <SFML/Network.hpp>
+
 
 struct clients{
 

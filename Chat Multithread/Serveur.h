@@ -8,11 +8,11 @@
 
 #include <SFML/Audio/SoundBufferRecorder.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
+#include <SFML/Audio/Sound.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/System/Clock.hpp>
-#include <SFML/Network/Packet.hpp>
 
-
+#include <SFML/Network.hpp>
 
 using namespace std;
 
@@ -26,12 +26,13 @@ class Serveur{
         void thread_serveur(Serveur *serveur);
         bool check_pseudo(SOCKET sock);
         int envoi_donnee(SOCKET sock, char *chaine, int taille);
-        void enregistrement_son(int i);
+        void son(char* IP, SOCKET sock);
 
     private:
         vector <SOCKET> m_sockets;
         SOCKET m_listenning_sock;
         vector <thread> m_threads;
+        vector <thread> m_threads_audio;
         SOCKADDR_IN m_sin, m_csin;
         int m_sock_err;
         int m_port, m_recsize, m_crecsize, m_connexion;

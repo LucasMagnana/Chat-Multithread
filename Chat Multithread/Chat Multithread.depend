@@ -140,3 +140,59 @@
 1455106989 f:\codeblocks\sfml-2.3.2\include\sfml\network\export.hpp
 	<SFML/Config.hpp>
 
+1455132707 source:f:\c-c++\chat-multithread_sauvegarde\chat multithread\main.cpp
+	<iostream>
+	"Serveur.h"
+
+1455225842 f:\c-c++\chat-multithread_sauvegarde\chat multithread\serveur.h
+	<thread>
+	<winsock2.h>
+	<vector>
+	"clients.h"
+	<SFML/Audio/SoundBufferRecorder.hpp>
+	<SFML/Audio/SoundBuffer.hpp>
+	<SFML/Audio/Sound.hpp>
+	<SFML/System/Time.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/Network.hpp>
+
+1455221641 f:\c-c++\chat-multithread_sauvegarde\chat multithread\clients.h
+	<winsock2.h>
+	<string>
+	<SFML/Network.hpp>
+
+1455225791 source:f:\c-c++\chat-multithread_sauvegarde\chat multithread\serveur.cpp
+	"Serveur.h"
+	<stdlib.h>
+	<stdio.h>
+	<iostream>
+	"clients.h"
+
+1455132707 source:c:\users\memorax\desktop\chat-multithread_sauvegarde\chat multithread\main.cpp
+	<iostream>
+	"Serveur.h"
+
+1455225842 c:\users\memorax\desktop\chat-multithread_sauvegarde\chat multithread\serveur.h
+	<thread>
+	<winsock2.h>
+	<vector>
+	"clients.h"
+	<SFML/Audio/SoundBufferRecorder.hpp>
+	<SFML/Audio/SoundBuffer.hpp>
+	<SFML/Audio/Sound.hpp>
+	<SFML/System/Time.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/Network.hpp>
+
+1455221641 c:\users\memorax\desktop\chat-multithread_sauvegarde\chat multithread\clients.h
+	<winsock2.h>
+	<string>
+	<SFML/Network.hpp>
+
+1455566884 source:c:\users\memorax\desktop\chat-multithread_sauvegarde\chat multithread\serveur.cpp
+	"Serveur.h"
+	<stdlib.h>
+	<stdio.h>
+	<iostream>
+	"clients.h"
+

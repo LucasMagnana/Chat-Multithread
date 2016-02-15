@@ -82,6 +82,8 @@ void Serveur::demarrage()
                     m_clients[m_connexion-1].sock =  m_sockets[m_connexion-1];
                     m_clients[m_connexion-1].IP = inet_ntoa(m_csin.sin_addr);
                     m_clients[m_connexion-1].pseudo = m_der_pseudo;
+                    m_threads_audio.push_back(thread(&Serveur::son, this, m_clients[m_connexion-1].IP, m_sockets[m_connexion-1]));
+                    m_threads_audio[m_connexion-1].detach();
 
                 }
 
@@ -90,6 +92,7 @@ void Serveur::demarrage()
                     envoi_donnee(m_sockets[m_connexion-1], "Serveur : Connexion impossible, votre pseudo est deja utilise...", 63);
                     m_connexion --;
                     m_sockets.pop_back();
+                    m_threads_audio.pop_back();
                 }
 
             }
@@ -134,6 +137,7 @@ void Serveur::thread_client(Serveur *serveur, SOCKET sock)
                             serveur->m_sockets.erase(serveur->m_sockets.begin()+i);
                             serveur->m_threads.erase(serveur->m_threads.begin()+i);
                             serveur->m_clients.erase(serveur->m_clients.begin()+i);
+                            serveur->m_threads_audio.erase(serveur->m_threads_audio.begin()+i);
                             m_connexion --;
                         }
                        // else cout << "envoi reussit" << endl;
@@ -209,17 +213,47 @@ bool Serveur::check_pseudo(SOCKET sock)
 }
 
 
-void Serveur::enregistrement_son(int i)
+void Serveur::son(char* IP, SOCKET sock)
 {
-    sf::SoundBufferRecorder enregistrement;
-    enregistrement.start();
-    m_horloge.restart();
-    sf::Time timer = m_horloge.getElapsedTime();
-    while(timer.asMilliseconds() < 50) timer = m_horloge.getElapsedTime();
-    enregistrement.stop();
-    m_buffers[i] = enregistrement.getBuffer();
-    sf::Packet envoi();
-    //envoi << enregistrement;
+        sf::Clock horloge;
+        sf::SoundBufferRecorder enregistrement;
+        sf::Time timer;
+        sf::SoundBuffer buffer_reception;
+        sf::Sound sound;
+        int compteur;
+        const sf::Int16 *sample_envoi;
+        sf::Packet packet, packet_compt;
+        sf::IpAddress ip(IP);
+        unsigned short port = 53870;
+
+        sf::UdpSocket socket;
+        socket.bind(25565);
+
+
+        while (1)
+        {
+            socket.receive(packet, ip, port);
+            for(int i = 0; i<m_connexion; i++)
+            {
+                socket.send(packet, m_clients[i].IP, port);
+            }
+            /*packet >> compteur;
+            //cout << "recep " << compteur <<endl;
+            sf::Int16 sample_rece [compteur];
+            for(int i=0; i<compteur; i++) packet >> sample_rece[i];
+
+            const sf::Int16 *sample = sample_rece;
+            buffer_reception.loadFromSamples(sample, compteur, 2, 22050);
+            sound.setBuffer(buffer_reception);
+
+            sound.play();
+            horloge.restart();
+            timer = horloge.getElapsedTime();
+            while(timer.asMilliseconds() < 600) timer = horloge.getElapsedTime();
+            sound.stop();*/
+        }
+
+
 
 }
 
