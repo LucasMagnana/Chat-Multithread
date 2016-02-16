@@ -97,7 +97,7 @@ void envoyer_son(char* IP, SOCKET sock)
         sample_envoi = buffer_envoi.getSamples();
         packet << compteur;
         for(int i=0; i<compteur; i++) packet << sample_envoi[i];
-        cout << "envoi " << compteur <<endl;
+        //cout << "envoi " << compteur <<endl;
 
         /*sound.setBuffer(buffer_envoi);
         sound.play();
@@ -121,18 +121,19 @@ void reception_son(char *IP)
         int compteur;
         const sf::Int16 *sample_envoi;
         sf::Packet packet, packet_compt;
-        sf::IpAddress ip("88.165.167.11");
-        unsigned short port = 25565;
+        sf::IpAddress ip(IP);
+        unsigned short port = 6112;
 
-        sf::UdpSocket socket;
-        socket.bind(53970);
+        sf::UdpSocket socket_rece, socket_envoi;
+        socket_rece.bind(6112);
+
 
 
         while (1)
         {
-            socket.receive(packet, ip, port);
+            socket_rece.receive(packet, ip, port);
             packet >> compteur;
-            cout << "recep " << compteur <<endl;
+            //cout << "recep " << compteur <<endl;
             sf::Int16 sample_rece [compteur];
             for(int i=0; i<compteur; i++) packet >> sample_rece[i];
 
@@ -143,7 +144,7 @@ void reception_son(char *IP)
             sound.play();
             horloge.restart();
             timer = horloge.getElapsedTime();
-            while(timer.asMilliseconds() < 700) timer = horloge.getElapsedTime();
+            while(timer.asMilliseconds() < 600) timer = horloge.getElapsedTime();
             sound.stop();
         }
 }

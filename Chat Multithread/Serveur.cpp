@@ -224,18 +224,19 @@ void Serveur::son(char* IP, SOCKET sock)
         const sf::Int16 *sample_envoi;
         sf::Packet packet, packet_compt;
         sf::IpAddress ip(IP);
-        unsigned short port = 53870;
+        unsigned short port = 25565;
 
-        sf::UdpSocket socket;
-        socket.bind(25565);
+        sf::UdpSocket socket_rece, socket_envoi;
+        socket_rece.bind(25565);
+
 
 
         while (1)
         {
-            socket.receive(packet, ip, port);
+            socket_rece.receive(packet, ip, port);
             for(int i = 0; i<m_connexion; i++)
             {
-                socket.send(packet, m_clients[i].IP, port);
+                socket_envoi.send(packet, "88.165.167.11", 6112);
             }
             /*packet >> compteur;
             //cout << "recep " << compteur <<endl;
