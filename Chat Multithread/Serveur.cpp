@@ -9,6 +9,7 @@ Serveur::Serveur(int port)
    m_port = port;
    m_connexion = 0;
    m_der_pseudo = (char*)calloc(8, sizeof(char));
+   m_socket_recep_son.bind(25565);
 }
 
 
@@ -55,6 +56,8 @@ void Serveur::initialisation()
 
 void Serveur::demarrage()
 {
+    sf::UdpSocket socket_rece;
+    socket_rece.bind(25565);
 
     while(1)
     {
@@ -69,10 +72,10 @@ void Serveur::demarrage()
             if(m_sock_err != SOCKET_ERROR)
             {
                 /* Attente pendant laquelle le client se connecte */
-                cout << "Patientez pendant que le client se connecte sur le port " << m_port << "..." << endl;
+                cout << "Patientez pendant que le client se connecte sur le port " << m_port << "..." << endl <<endl;
                 m_sockets.push_back(accept(m_listenning_sock, (SOCKADDR*)&m_csin, &m_crecsize)); /*Ajout du socket envoyé par le client dans le tableau dynamique de sockets du serveur */
                 m_connexion ++;
-                cout << "Un client se connecte avec la socket" << m_sockets[m_connexion-1] << "de " << inet_ntoa(m_csin.sin_addr) << " : " << htons(m_csin.sin_port) <<endl;
+                cout << "Un client se connecte avec la socket " << m_sockets[m_connexion-1] << "de " << inet_ntoa(m_csin.sin_addr) << " : " << htons(m_csin.sin_port) <<endl <<endl;
                 if (check_pseudo(m_sockets[m_connexion-1]) == true)
                 {
                     m_threads.push_back(thread(&Serveur::thread_client, this, this, m_sockets[m_connexion-1])); /* Creation (et lancement) d'un thread dans le tableau dynamique de thread qui va s'occuper du client qui vient de se connecter */
@@ -80,9 +83,9 @@ void Serveur::demarrage()
                     clients struct_temoin;
                     m_clients.push_back(struct_temoin);
                     m_clients[m_connexion-1].sock =  m_sockets[m_connexion-1];
-                    m_clients[m_connexion-1].IP = inet_ntoa(m_csin.sin_addr);
+                    reception_ip(m_sockets[m_connexion-1]);
                     m_clients[m_connexion-1].pseudo = m_der_pseudo;
-                    m_threads_audio.push_back(thread(&Serveur::son, this, m_clients[m_connexion-1].IP, m_sockets[m_connexion-1]));
+                    m_threads_audio.push_back(thread(&Serveur::son, this));
                     m_threads_audio[m_connexion-1].detach();
 
                 }
@@ -199,21 +202,21 @@ bool Serveur::check_pseudo(SOCKET sock)
         {
             while(i<m_connexion-1 && retour == true)
             {
-                cout << i << " : " << (m_clients[i].pseudo).compare(buffer)<<endl;
+                //cout << i << " : " << (m_clients[i].pseudo).compare(buffer)<<endl;
                 if (m_clients[i].pseudo.compare(buffer) == 0) retour = false;
                 else retour = true;
                 i++;
 
             }
         }
-    cout << retour <<endl;
+    //cout << retour <<endl;
     m_der_pseudo = buffer;
     return retour;
     }
 }
 
 
-void Serveur::son(char* IP, SOCKET sock)
+void Serveur::son()
 {
         sf::Clock horloge;
         sf::SoundBufferRecorder enregistrement;
@@ -223,22 +226,23 @@ void Serveur::son(char* IP, SOCKET sock)
         int compteur;
         const sf::Int16 *sample_envoi;
         sf::Packet packet, packet_compt;
-        sf::IpAddress ip(IP);
+        int num_client = m_connexion-1;
+        sf::IpAddress ip(m_clients[num_client].IP);
         unsigned short port = 25565;
 
-        sf::UdpSocket socket_rece, socket_envoi;
-        socket_rece.bind(25565);
+        sf::UdpSocket socket_envoi;
 
 
 
         while (1)
         {
-            socket_rece.receive(packet, ip, port);
+            m_socket_recep_son.receive(packet, ip, port);
             for(int i = 0; i<m_connexion; i++)
             {
-                socket_envoi.send(packet, "88.165.167.11", 6112);
+                //cout << m_clients[i].IP <<endl;
+                socket_envoi.send(packet, m_clients[i].IP, 6112);
             }
-            /*packet >> compteur;
+            packet >> compteur;
             //cout << "recep " << compteur <<endl;
             sf::Int16 sample_rece [compteur];
             for(int i=0; i<compteur; i++) packet >> sample_rece[i];
@@ -251,11 +255,35 @@ void Serveur::son(char* IP, SOCKET sock)
             horloge.restart();
             timer = horloge.getElapsedTime();
             while(timer.asMilliseconds() < 600) timer = horloge.getElapsedTime();
-            sound.stop();*/
+            sound.stop();
         }
 
 
 
+}
+
+
+char * Serveur::reception_ip(SOCKET sock)
+{
+    int taille_int, sock_err;
+    char taille[4];
+    char *buffer = (char*)calloc(8, sizeof(char));
+
+    sock_err = recv(sock, taille, 4, 0);
+    cout << "taille ip : " << taille << endl;
+
+
+
+    if (sock_err != -1)
+    {
+        taille_int = atoi(taille);
+        cout << "taille int_ip : " << taille_int << endl;
+
+        buffer = (char*)realloc(buffer, taille_int);
+        sock_err = recv(sock, buffer, taille_int,0);
+        if(sock_err != -1) m_clients[m_connexion-1].IP = buffer;
+        cout << "ip : " << buffer <<endl <<endl;
+    }
 }
 
 

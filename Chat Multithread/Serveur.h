@@ -26,7 +26,8 @@ class Serveur{
         void thread_serveur(Serveur *serveur);
         bool check_pseudo(SOCKET sock);
         int envoi_donnee(SOCKET sock, char *chaine, int taille);
-        void son(char* IP, SOCKET sock);
+        void son();
+        char * reception_ip(SOCKET sock);
 
     private:
         vector <SOCKET> m_sockets;
@@ -40,6 +41,7 @@ class Serveur{
         string m_der_pseudo;
         sf::Clock m_horloge;
         vector <sf::SoundBuffer> m_buffers;
+        sf::UdpSocket m_socket_recep_son;
 };
 
 #endif // SERVEUR_H_INCLUDED

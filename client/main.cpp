@@ -20,19 +20,27 @@ using namespace std;
 void envoi_donnee(SOCKET sock, string str_envoi)
 {
 
+    cout << "deuxieme test : " << str_envoi <<endl;
     char *chaine = new char [str_envoi.length()+1];
     strcpy (chaine, str_envoi.c_str());
     char taille[4];
     sprintf(taille, "%d", str_envoi.length()+1);
 
-    int sock_err, taille_int;
+    int sock_err;
 
+    //cout << taille <<endl;
+
+    cout << "troisieme test : " << str_envoi <<endl;
     sock_err = send(sock, taille, 4, 0);
+    cout << "quatrieme test : " << str_envoi <<endl;
     if (sock_err == -1) cout << "sa a pas marcher" <<endl;
     //else cout << "envoi reussit" <<endl;
 
+    cout << "cinquieme test : " << str_envoi <<endl;
     sock_err = send(sock, chaine, str_envoi.length()+1, 0);
+    cout << "sixieme test : " << str_envoi <<endl;
     if (sock_err == -1) cout << "sa a pas marcher" <<endl;
+    //cout << chaine <<endl;
     //else cout << "envoi reussit" <<endl;
 
 
@@ -42,8 +50,7 @@ void fcn_thread_envoi(SOCKET sock, string str_pseudo)
 {
     while(1)
     {
-        string str = ("Je viens de me connecter...");
-        string str_envoi;
+        string str_envoi, str;
         getline(cin, str);
         str_envoi = str_pseudo + str;
         envoi_donnee(sock, str_envoi);
@@ -221,14 +228,21 @@ int main()
 
         /* Si le client arrive à se connecter */
         if(connect(sock, (SOCKADDR*)&sin, sizeof(sin)) != SOCKET_ERROR)
-            printf("Connexion à %s sur le port %d\n", inet_ntoa(sin.sin_addr), htons(sin.sin_port));
+            printf("Connecter a %s sur le port %d\n", inet_ntoa(sin.sin_addr), htons(sin.sin_port));
         else
             printf("Impossible de se connecter\n");
 
 
     }
 
+
     envoi_donnee(sock, pseudo_str);
+
+    sf::IpAddress mon_ip = sf::IpAddress::getPublicAddress();
+    string str("    " + mon_ip.toString());
+    cout << "premier test : " << str <<endl;
+    envoi_donnee(sock, str);
+
     pseudo_str += " : ";
     thread thread_envoi(fcn_thread_envoi, sock, pseudo_str);
     thread_envoi.detach();
