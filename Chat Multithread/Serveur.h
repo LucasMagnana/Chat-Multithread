@@ -42,6 +42,8 @@ class Serveur{
         sf::Clock m_horloge;
         vector <sf::SoundBuffer> m_buffers;
         sf::UdpSocket m_socket_recep_son;
+        vector <sf::TcpSocket *> m_sockets_son;
+        sf::TcpListener m_listener;
 };
 
 #endif // SERVEUR_H_INCLUDED

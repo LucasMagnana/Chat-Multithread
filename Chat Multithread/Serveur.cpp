@@ -224,11 +224,14 @@ void Serveur::son()
         sf::SoundBuffer buffer_reception;
         sf::Sound sound;
         int compteur;
-        const sf::Int16 *sample_envoi;
-        sf::Packet packet, packet_compt;
+        sf::Packet packet;
         int num_client = m_connexion-1;
         sf::IpAddress ip(m_clients[num_client].IP);
-        unsigned short port = 25565;
+
+        m_listener.listen(6112);
+        sf::TcpSocket socket_temoin;
+        m_listener.accept(socket_temoin);
+        m_sockets_son.push_back(&socket_temoin);
 
         sf::UdpSocket socket_envoi;
 
@@ -236,11 +239,11 @@ void Serveur::son()
 
         while (1)
         {
-            m_socket_recep_son.receive(packet, ip, port);
+            m_sockets_son[num_client]->receive(packet);
             for(int i = 0; i<m_connexion; i++)
             {
                 //cout << m_clients[i].IP <<endl;
-                socket_envoi.send(packet, m_clients[i].IP, 6112);
+                m_sockets_son[i]->send(packet);
             }
             packet >> compteur;
             //cout << "recep " << compteur <<endl;

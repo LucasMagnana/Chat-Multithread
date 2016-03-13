@@ -20,7 +20,6 @@ using namespace std;
 void envoi_donnee(SOCKET sock, string str_envoi)
 {
 
-    cout << "deuxieme test : " << str_envoi <<endl;
     char *chaine = new char [str_envoi.length()+1];
     strcpy (chaine, str_envoi.c_str());
     char taille[4];
@@ -30,15 +29,11 @@ void envoi_donnee(SOCKET sock, string str_envoi)
 
     //cout << taille <<endl;
 
-    cout << "troisieme test : " << str_envoi <<endl;
     sock_err = send(sock, taille, 4, 0);
-    cout << "quatrieme test : " << str_envoi <<endl;
     if (sock_err == -1) cout << "sa a pas marcher" <<endl;
     //else cout << "envoi reussit" <<endl;
 
-    cout << "cinquieme test : " << str_envoi <<endl;
     sock_err = send(sock, chaine, str_envoi.length()+1, 0);
-    cout << "sixieme test : " << str_envoi <<endl;
     if (sock_err == -1) cout << "sa a pas marcher" <<endl;
     //cout << chaine <<endl;
     //else cout << "envoi reussit" <<endl;
@@ -78,7 +73,7 @@ void reception(SOCKET sock)
 }
 
 
-void envoyer_son(char* IP, SOCKET sock)
+void envoyer_son(sf::TcpSocket *socket)
 {
     sf::Clock horloge;
     sf::SoundBufferRecorder enregistrement;
@@ -86,8 +81,6 @@ void envoyer_son(char* IP, SOCKET sock)
     sf::SoundBuffer buffer_envoi;
     int compteur;
     const sf::Int16 *sample_envoi;
-    sf::UdpSocket socket;
-    sf::IpAddress ip(IP);
     sf::Sound sound;
     sf::Packet packet_compt;
 
@@ -111,14 +104,15 @@ void envoyer_son(char* IP, SOCKET sock)
         horloge.restart();
         timer = horloge.getElapsedTime();
 
-        while(timer.asMilliseconds() < 2000) timer = horloge.getElapsedTime();*/
-        socket.send(packet, ip, 25565);
-    }
+        while(timer.asMilliseconds() < 600) timer = horloge.getElapsedTime();
+        sound.stop();*/
+        socket->send(packet);
 
+    }
 }
 
 
-void reception_son(char *IP)
+void reception_son(sf::TcpSocket *socket)
 {
         sf::Clock horloge;
         sf::SoundBufferRecorder enregistrement;
@@ -128,17 +122,11 @@ void reception_son(char *IP)
         int compteur;
         const sf::Int16 *sample_envoi;
         sf::Packet packet, packet_compt;
-        sf::IpAddress ip(IP);
-        unsigned short port = 6112;
-
-        sf::UdpSocket socket_rece, socket_envoi;
-        socket_rece.bind(6112);
-
 
 
         while (1)
         {
-            socket_rece.receive(packet, ip, port);
+            socket->receive(packet);
             packet >> compteur;
             //cout << "recep " << compteur <<endl;
             sf::Int16 sample_rece [compteur];
@@ -147,14 +135,15 @@ void reception_son(char *IP)
             const sf::Int16 *sample = sample_rece;
             buffer_reception.loadFromSamples(sample, compteur, 2, 22050);
             sound.setBuffer(buffer_reception);
-
             sound.play();
             horloge.restart();
             timer = horloge.getElapsedTime();
+
             while(timer.asMilliseconds() < 600) timer = horloge.getElapsedTime();
             sound.stop();
         }
 }
+
 
 
 int main()
@@ -216,7 +205,12 @@ int main()
     std::cin >> IP;
 
     if(!erreur)
-    {
+    {    envoi_donnee(sock, pseudo_str);
+
+    sf::IpAddress mon_ip = sf::IpAddress::getPublicAddress();
+    string str("    " + mon_ip.toString());
+    cout << "premier test : " << str <<endl;
+    envoi_donnee(sock, str);
 
         /* Création de la socket */
         sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -240,16 +234,20 @@ int main()
 
     sf::IpAddress mon_ip = sf::IpAddress::getPublicAddress();
     string str("    " + mon_ip.toString());
-    cout << "premier test : " << str <<endl;
     envoi_donnee(sock, str);
 
     pseudo_str += " : ";
     thread thread_envoi(fcn_thread_envoi, sock, pseudo_str);
     thread_envoi.detach();
-    thread thread_audio(envoyer_son, IP, sock);
+
+    sf::TcpSocket socket;
+    socket.connect(IP, 6112);
+
+    thread thread_audio(envoyer_son, &socket);
     thread_audio.detach();
-    thread thread_recep_audio(reception_son, IP);
+    thread thread_recep_audio(reception_son, &socket);
     thread_recep_audio.detach();
+
     thread thread_reception(reception, sock);
     thread_reception.join();
 
